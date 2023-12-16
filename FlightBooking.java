@@ -3,7 +3,8 @@
 1)If a user has two more ticket under his username, when cancel time does there have option which on to delete ? 
 [So far the system cancel all the ticket under his name once he click delete, after this might work on it ] 
 2) Make use of password function such as such as when booking time ask their password as verification. [Working on it]
-3) Others please write any questions here so we can figure it out together.
+3) The personal information will change later.
+4) Others please write any questions here so we can figure it out together.
 */
 
 //Trishan: BOOK,EDIT,LOG OUT,LOGIN,CANCEL,VIEW BOOKING.
