@@ -97,7 +97,6 @@ public class FlightBook {
     public static void main(String[] args) {
         
         boolean exit = false;
-        boolean isValid=false;
         String personal_info=null;
         Ticket[] book = new Ticket[3];
         MyQueue<Ticket> myq = new MyQueue<>(10);
@@ -117,12 +116,11 @@ public class FlightBook {
         myq.enqueue(num5);
         myq.enqueue(num6);
 
-
         do {
-            if(isValid==false){
-            personal_info=Login();
-            isValid=true;
-           }
+           
+            if(personal_info==null){
+                personal_info=Login();
+            }
             //Menu
             int option;
             System.out.println("Welcome to Cloud Wings");
@@ -154,7 +152,7 @@ public class FlightBook {
                     cancelTicket(book,myq,personal_info);
                     break;
                 case 6:
-                    LogOut(isValid);
+                   personal_info=LogOut(personal_info);
                     break;
                 default:
                     System.out.println("Wrong number inputed, Please Try Again.");
@@ -173,6 +171,8 @@ public class FlightBook {
         Scanner logkey=new Scanner(System.in);
         System.out.print("Username: ");
         username=logkey.nextLine();
+        System.out.print("Password: ");
+        password=logkey.nextLine();
         return username;
     }
     
@@ -313,12 +313,12 @@ public class FlightBook {
     // 5.Cancel_Ticket [DONE]
     public static void cancelTicket(Ticket[] book,MyQueue<Ticket> myq,String username){
         
-        String ans;
+        int ans;
         Boolean cancel_book=false,cancel_wait=true;
         Scanner confirm=new Scanner(System.in);
-        System.out.print("Are you sure to cancel the ticket? ( Yes| No ): ");  //Confirmation to delete
-        ans=confirm.nextLine();
-        if(ans.equals("Yes")){   
+        System.out.print("Are you sure to cancel the ticket? [ 1.Yes| 2.No ]: ");  //Confirmation to delete
+        ans=confirm.nextInt();
+        if(ans==1){   
            
             //Cancel ticket in confirmed booking
             for(int a=0;a<book.length;a++){               //Loop to check the username
@@ -363,24 +363,25 @@ public class FlightBook {
     }
     
     //6. LogOut [Done]
-    public static void LogOut(boolean isValid){
+    public static String LogOut(String personal_info){
         
         Scanner log=new Scanner(System.in);
-        int log_out=0;
+        String log_out=null;
         System.out.print("Are you sure to log out? [1:Yes | 2:No]: ");
-        log_out=log.nextInt();
+        log_out=log.nextLine();
         switch (log_out) {
-            case 1:
-                isValid=false;
+            case "1":
                 System.out.println("Thank You for using our system.Have a safe journey");
+                log_out=null;
                 break;
-            case 2:
-                isValid=true;
+            case "2":
+                log_out=personal_info;
                 break;
             default:
                 System.out.println("Wrong Input, Please Try Again.");
                 break;
-        }       
+        } 
+        return log_out;
     }
 }
 
