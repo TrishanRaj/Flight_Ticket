@@ -1,0 +1,73 @@
+import java.util.Scanner;
+import java.util.Random;
+
+public class DSGROUPPROJECT {
+
+    public static void main(String[] args) {
+        
+        Scanner input = new Scanner (System.in);
+        
+        System.out.println("Welcome to our Flight Booking System!");
+        
+        System.out.print("Enter the month of your travel: ");
+        String month = input.nextLine();
+        
+        System.out.print("Enter the week of your travel (Week 1/Week 2/Week 3/Week 4): Week ");
+        int week = input.nextInt();
+        
+        switch (week) {
+            case 1:
+                BookingFlight(week, month, 1, 7);
+                break;
+            case 2:
+                BookingFlight(week, month, 8, 14);
+                break;
+            case 3:
+                BookingFlight(week, month, 15, 21);
+                break;
+            case 4:
+                BookingFlight(week, month, 22, 28);
+                break;
+            default:
+                System.out.println("Invalid week selection. Please enter a value between 1 to 4.");
+            break;
+        }
+
+    }
+    
+    private static void BookingFlight (int week, String month, int starting, int ending) {
+        
+        Random random = new Random ();
+        Scanner scan = new Scanner (System.in);
+        
+        System.out.println("You have entered Week " + week + ". You will be travelling from " + starting + " of " + month + " to " + ending + " of " + month + ".");
+        
+        System.out.print("Enter number of tickets you would like to purchase: ");
+        int tickets = scan.nextInt();
+        
+        System.out.println("\n---FLIGHT DETAILS---");
+        
+        System.out.println("Flight 1: Malaya " + (random.nextInt(900) + 100) + "\nDeparture Time: " + (random.nextInt(12) + 1) + "AM");
+        System.out.println("----------");
+        
+        System.out.println("Flight 2: Malaya " + (random.nextInt(900) + 100) + "\nDeparture Time: " + (random.nextInt(12) + 1) + "PM");
+        System.out.println("----------");
+
+        System.out.print("\nChoose Your Flight (1/2): Flight ");
+        int flight = scan.nextInt();
+        
+        System.out.println("You have chosen Flight " + flight + ".");
+        
+        System.out.print("Confirm booking? Yes or No? ");
+        String confirm = scan.next();
+        
+        if (confirm.equalsIgnoreCase("Yes")) {
+            System.out.println("You have sucessfully booked " + tickets + " ticket(s) for Flight " + flight + "!");
+        }
+        else {
+            System.out.println("We're sorry to see you go. Thank you for choosing us.");
+        }
+        
+    }   
+    
+}
