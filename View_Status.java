@@ -2,7 +2,7 @@
 package flightbook;
 
 public class View_Status {
-
+    
     // 4. View all booking and waitlist status [Done]
     public static void viewTicketStatus(Ticket[] book, MyQueue<Ticket> waitList, String username) {
         boolean view_confirm = false, view_wait = false;  // Similar to edit ticket coding
@@ -20,7 +20,6 @@ public class View_Status {
                 System.out.println("*********************");
                 System.out.println("");
                 view_confirm = true;
-                return;
             }
         }
 
