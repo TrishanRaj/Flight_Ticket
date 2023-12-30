@@ -1,0 +1,9 @@
+ Ticket num1 = new Ticket("John", "010711050223", "0126240537","john123","Malaya307",Time,"Confirmed");
+        Ticket num2 = new Ticket("Sarah", "010711050223", "0126240537","sarah113","Malaya307",Time,"Confirmed");
+        Ticket num3 = new Ticket("Mira", "010711050223", "0126240537","mira123","Malay307",Time,"Confirmed");
+        Ticket num4 = new Ticket("Shira", "010711050223", "0126240537","shira123","Malaya307",Time,"Waiting");
+        
+        book[0]=num1;
+        book[1]=num2;
+        book[2]=num3;
+        myq.enqueue(num4);
