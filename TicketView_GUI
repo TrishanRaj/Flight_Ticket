@@ -1,0 +1,161 @@
+import java.util.Scanner;
+import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.Scene;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class TicketViewGUI extends Application {
+    private TableView<Ticket> ticketTable = new TableView<>();
+    private ObservableList<Ticket> ticketData = FXCollections.observableArrayList();
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        // Create UI elements
+        TableColumn<Ticket, String> passengerNameColumn = new TableColumn<>("Passenger Name");
+        passengerNameColumn.setCellValueFactory(cellData -> cellData.getValue().passengerNameProperty());
+
+        TableColumn<Ticket, String> passportNoColumn = new TableColumn<>("Passport Number");
+        passportNoColumn.setCellValueFactory(cellData -> cellData.getValue().passportNoProperty());
+
+        TableColumn<Ticket, String> phoneNumColumn = new TableColumn<>("Phone Number");
+        phoneNumColumn.setCellValueFactory(cellData -> cellData.getValue().phoneNumProperty());
+
+        TableColumn<Ticket, String> flightNameColumn = new TableColumn<>("Flight Name");
+        flightNameColumn.setCellValueFactory(cellData -> cellData.getValue().flightNameProperty());
+
+        TableColumn<Ticket, String> departureDateColumn = new TableColumn<>("Departure Date");
+        departureDateColumn.setCellValueFactory(cellData -> cellData.getValue().departureDateProperty());
+
+        TableColumn<Ticket, String> departureTimeColumn = new TableColumn<>("Departure Time");
+        departureTimeColumn.setCellValueFactory(cellData -> cellData.getValue().departureTimeProperty());
+
+        TableColumn<Ticket, String> statusColumn = new TableColumn<>("Status");
+        statusColumn.setCellValueFactory(cellData -> cellData.getValue().statusProperty());
+        
+        // Set preferred column widths
+    passengerNameColumn.setPrefWidth(150);
+    passportNoColumn.setPrefWidth(150);
+    phoneNumColumn.setPrefWidth(150);
+    flightNameColumn.setPrefWidth(150);
+    departureDateColumn.setPrefWidth(150);
+    departureTimeColumn.setPrefWidth(150);
+    statusColumn.setPrefWidth(100);
+
+
+        ticketTable.getColumns().addAll(passengerNameColumn, passportNoColumn, phoneNumColumn,
+                flightNameColumn, departureDateColumn, departureTimeColumn, statusColumn);
+
+        ticketTable.setItems(ticketData);
+
+        VBox root = new VBox(ticketTable);
+
+        // Create the Scene
+        Scene scene = new Scene(root, 1000, 500);
+
+        // Set the scene and show the stage
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("View Your Tickets Here");
+        primaryStage.show();
+    }
+
+    // Assuming you have a method like this in your TicketBookingApp class
+    public void bookTicket(Ticket[] book, MyQueue<Ticket> waitList, String username) {
+     Scanner obj = new Scanner(System.in);
+
+        // Get passenger details
+        System.out.print("Passenger Name: ");
+        String passengerName = obj.next();
+        System.out.print("Passport Number: ");
+        String passportNo = obj.next();
+        System.out.print("Phone Number: ");
+        String phoneNum = obj.next();
+        System.out.print("Flight Name: ");
+        String flightName = obj.next();
+        System.out.print("Departure Date: ");
+        String departureDate = obj.next();
+        System.out.print("Departure Time: ");
+        String departureTime = obj.next();
+
+        // Create Ticket object and book the ticket
+        Ticket myTicket = new Ticket(passengerName, passportNo, phoneNum,
+                flightName, departureDate, departureTime, null);
+
+        // Find the first null entry in the book array and book the ticket
+        boolean booked = false;
+        for (int a = 0; a < book.length; a++) {
+            if (book[a] == null) {
+                book[a] = myTicket;
+                booked = true;
+                break;
+            }
+        }
+
+        if (booked) {
+            System.out.println("\nSuccessfully Booked");
+            myTicket.status.set("Confirmed");
+        } else {
+            System.out.println("\nConfirm book is full. Currently in the waiting list");
+            myTicket.status.set("Waiting");
+            waitList.enqueue(myTicket);
+        }
+
+        // Update UI with booked ticket information
+        if (booked) {
+            ticketData.add(myTicket);
+        }
+    }
+
+    public static class Ticket {
+        private final StringProperty passengerName = new SimpleStringProperty();
+        private final StringProperty passportNo = new SimpleStringProperty();
+        private final StringProperty phoneNum = new SimpleStringProperty();
+        private final StringProperty flightName = new SimpleStringProperty();
+        private final StringProperty departureDate = new SimpleStringProperty();
+        private final StringProperty departureTime = new SimpleStringProperty();
+        private final StringProperty status = new SimpleStringProperty();
+
+        public Ticket(String passengerName, String passportNo, String phoneNum,
+                      String flightName, String departureDate, String departureTime, String status) {
+            // Constructor and other methods of your Ticket class
+        }
+
+        // Getters for properties
+        public StringProperty passengerNameProperty() {
+            return passengerName;
+        }
+
+        public StringProperty passportNoProperty() {
+            return passportNo;
+        }
+
+        public StringProperty phoneNumProperty() {
+            return phoneNum;
+        }
+
+        public StringProperty flightNameProperty() {
+            return flightName;
+        }
+
+        public StringProperty departureDateProperty() {
+            return departureDate;
+        }
+
+        public StringProperty departureTimeProperty() {
+            return departureTime;
+        }
+
+        public StringProperty statusProperty() {
+            return status;
+        }
+    }
+}
