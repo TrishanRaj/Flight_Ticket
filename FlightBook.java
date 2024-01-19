@@ -22,9 +22,9 @@ class Ticket {
         this.username=username;
         this.status=status;      
     }
+    
   @Override
     public String toString() {
-
             return "| "+passportNo+" |\t"+passengerName+"\t| Waiting\t|";  
     }
 }
@@ -97,6 +97,7 @@ public class FlightBook {
         boolean exit = false;
         String personal_info=null;
         Ticket[] book = new Ticket[3];
+        MyQueue<Ticket> waitList = new MyQueue<>(50);
         MyQueue<Ticket> myq = new MyQueue<>(10);
               
        //Trial Value 
@@ -113,18 +114,23 @@ public class FlightBook {
         myq.enqueue(num4);
         myq.enqueue(num5);
         myq.enqueue(num6);
-
+        String username = null, password;
         do {
-           
             if(personal_info==null){
-                personal_info=Login();
+//               personal_info=Login();
+                Scanner logkey = new Scanner(System.in);
+                System.out.print("Username: ");
+                username=logkey.nextLine();
+                System.out.print("Password: ");
+                password=logkey.nextLine();
+//        return username;
             }
             //Menu
             int option;
             System.out.println("Welcome to Cloud Wings");
             System.out.println("*************************");            
             System.out.println("1. Search for flight");
-            System.out.println("2. Book a ticket");
+//            System.out.println("2. Book a ticket");
             System.out.println("3. Edit ticket information");
             System.out.println("4. View ticket status");
             System.out.println("5. Cancel ticket");
@@ -137,11 +143,11 @@ public class FlightBook {
             switch (option) {
                 
                 case 1:
-                    getFlightInfo();
+                    getFlightInfo(book , waitList , username);
                     break;
-                case 2:
-                    bookTicket(book, myq,personal_info);
-                    break;
+//                case 2:
+//                    bookTicket(book, myq,personal_info);
+//                    break;
                 case 3:
                     editTicketInfo(book,myq,personal_info);
                     break;
@@ -162,9 +168,7 @@ public class FlightBook {
                     break;
                 
             }
-        } while (exit == false);
-        
-        
+        } while (exit == false);   
     }
 
     //Personal Information [Done]  //Conside everyone who uses the system has the username.
@@ -179,7 +183,7 @@ public class FlightBook {
         return username;
     }
     
-    public static void getFlightInfo(){
+    public static void getFlightInfo(Ticket[] book, MyQueue<Ticket> waitList, String username){
         Scanner input = new Scanner (System.in);
         final int WEEK_1 = 1;   
         final int WEEK_2 = 2;
@@ -204,27 +208,27 @@ public class FlightBook {
         
         switch (week) {
             case WEEK_1:
-                BookingFlight(week, month, 1, 7);
+                BookingFlight(week, month, 1, 7 , book , waitList , username);
                 break;
             case WEEK_2:
-                BookingFlight(week, month, 8, 14);
+                BookingFlight(week, month, 8, 14 , book , waitList , username);
                 break;
             case WEEK_3:
-                BookingFlight(week, month, 15, 21);
+                BookingFlight(week, month, 15, 21 , book , waitList , username);
                 break;
             case WEEK_4:
-                BookingFlight(week, month, 22, 28);
+                BookingFlight(week, month, 22, 28 , book , waitList , username);
                 break;
             case WEEK_5:
                 switch(month) {
                     case "January" , "March" , "May" , "July" , "August" , "October" , "December" :
-                        BookingFlight(week , month , 29 , 31);
+                        BookingFlight(week , month , 29 , 31 , book , waitList , username);
                         break;
                     case "February" :
                         System.out.println("Invalid week for this particular month. Please choose another week");
                         break;
                     case "April" , "June" , "Septmber" , "November" :
-                        BookingFlight(week , month , 29 , 30);
+                        BookingFlight(week , month , 29 , 30 , book , waitList , username);
                         break;
                 }        
                 break;
@@ -235,11 +239,10 @@ public class FlightBook {
             }
         }    
     }
-    
-    
-    private static void BookingFlight (int week, String month, int starting, int ending) {
+       
+    private static void BookingFlight (int week, String month, int starting, int ending , Ticket[] book, MyQueue<Ticket> waitList, String username) {
         
-        Random random = new Random ();
+        Random random = new Random();
         Scanner scan = new Scanner (System.in);
         
         System.out.println("You have entered Week " + week + ". You will be travelling from " + starting + " of " + month + " to " + ending + " of " + month + ".");
@@ -248,8 +251,6 @@ public class FlightBook {
         int tickets = scan.nextInt();
         
         System.out.println("\n---FLIGHT DETAILS---");
-        
-        
         
         for (int i = 0; i < tickets + 5; i++) {
             System.out.println("Flight " + i + ": Malaya " + (random.nextInt(900) + 100) + "\nDeparture Time: " + (random.nextInt(12) + 1) + "AM");
@@ -265,17 +266,7 @@ public class FlightBook {
         String confirm = scan.next();
         
         if (confirm.equalsIgnoreCase("Yes")) {
-            System.out.println("\n" +"You have sucessfully booked " + tickets + " ticket(s) for Flight " + flight + "!");
-        }
-        else {
-            System.out.println("We're sorry to see you go. Thank you for choosing us.");
-        }
-        
-    }   
-     
-    // 2.Book Ticket [Done]
-    public static void bookTicket(Ticket[] book, MyQueue<Ticket> waitList, String username) {   //In parameter have the queue for waiting list and confirm_booked array     
-        
+//            System.out.println("\n" +"You have sucessfully booked " + tickets + " ticket(s) for Flight " + flight + "!");
         String passengerName, passportNo, phoneNum;   //Information needed to book the flight.
         Scanner obj = new Scanner(System.in);
         //Key in all the information
@@ -287,22 +278,63 @@ public class FlightBook {
         phoneNum = obj.nextLine();
         
         Ticket myTicket = new Ticket(passengerName, passportNo, phoneNum,username,null); //Send the value to Ticket Class
-        boolean booked = false;  //Booked set to false beacuse so far no booking.
-        for (int a = 0; a < book.length; a++) {  //Loop the book array to check there is empty place to fill.
-            if (book[a] == null) {
-                book[a].status="Confirmed";
-                book[a] = myTicket;
-                booked = true;
-                break;
-            }                     
+       boolean booked = false;
+    for (int a = 0; a < book.length; a++) {
+        if (book[a] == null) {
+            book[a] = myTicket;
+            book[a].status = "Confirmed";
+            booked = true;
+            break;
         }
+    }
+
+    if (!booked) {
+        System.out.println("All confirmations are full. Would you like to book a waiting ticket? (Yes/No)");
+        String response = scan.next();
+
+        if (response.equalsIgnoreCase("Yes")) {
+            myTicket.status = "Waiting";
+            waitList.enqueue(myTicket);
+        } else {
+            System.out.println("Thank you for choosing us.");
+        }
+    }
+        }
+        else {
+            System.out.println("We're sorry to see you go. Thank you for choosing us.");
+        }   
+    }   
+     
+    // 2.Book Ticket [Done]
+    public static void bookTicket(Ticket[] book, MyQueue<Ticket> waitList, String username) {   //In parameter have the queue for waiting list and confirm_booked array     
         
-        if (booked == false) {   //If the ocnfirm book is full, the user will be added in the waitlist queue
-            getFlightInfo();
-            //System.out.println("\nSuccessfully Booked"); 
-            myTicket.status="Waiting";
-            waitList.enqueue(myTicket);  //Enqueue the value into waitlist.
-        }       
+//        String passengerName, passportNo, phoneNum;   //Information needed to book the flight.
+//        Scanner obj = new Scanner(System.in);
+//        //Key in all the information
+//        System.out.print("Passanger Name: ");
+//        passengerName = obj.nextLine();
+//        System.out.print("Passport Number: ");
+//        passportNo = obj.nextLine();
+//        System.out.print("Phone Number: ");
+//        phoneNum = obj.nextLine();
+//        
+//        Ticket myTicket = new Ticket(passengerName, passportNo, phoneNum,username,null); //Send the value to Ticket Class
+//        boolean booked = false;  //Booked set to false beacuse so far no booking.
+//        for (int a = 0; a < book.length; a++) {  //Loop the book array to check there is empty place to fill.
+//            if (book[a] == null) {
+//                book[a].status="Confirmed";
+//                book[a] = myTicket;
+//                booked = true;
+//                break;
+//            }                     
+//        }
+//        
+//        if (booked == false) {   //If the ocnfirm book is full, the user will be added in the waitlist queue
+//            getFlightInfo();
+//            //System.out.println("\nSuccessfully Booked"); 
+//            myTicket.status="Waiting";
+//            waitList.enqueue(myTicket);  //Enqueue the value into waitlist.
+//        }       
     }
 
     // 3.Edit Passanger Information [Done]
@@ -477,8 +509,7 @@ public class FlightBook {
         // Close the scanner to prevent resource leaks
         scanner.close();
     }
-    
-    
+       
     //7. LogOut [Done]
     public static String LogOut(String personal_info){
         
