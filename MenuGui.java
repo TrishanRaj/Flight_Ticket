@@ -32,7 +32,7 @@ public class MenuGui extends Stage {
 
         btnBook.setOnAction(e -> openBookingGui(userName,book,waitList));
         btnTicket.setOnAction(e -> openTicketGui(userName,book,waitList));
-        btnLogout.setOnAction(e -> openLoginGui());
+        btnLogout.setOnAction(e -> openLoginGui(book,waitList));
 
         HBox hbox = new HBox(btnSearch, btnBook, btnTicket, btnLogout);
 
@@ -47,9 +47,9 @@ public class MenuGui extends Stage {
          setScene(new Scene(hbox, 800, 500));
     }
 
-     private void openLoginGui() {
-        LoginGui loginGui = new LoginGui();
-        loginGui.start(new Stage()); // Create a new stage for LoginGui
+     private void openLoginGui(Ticket[] book, MyQueue<Ticket> waitList) {
+        LoginUserGui loginGui = new LoginUserGui(book,waitList);
+        loginGui.show(); // Create a new stage for LoginGui
         close(); // Close the current MenuGui window
     }
      
