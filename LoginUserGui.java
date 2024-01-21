@@ -32,7 +32,7 @@ public class LoginUserGui extends Stage {
     BorderPane root = new BorderPane();
 
     // Create title bar
-    HBox titleBar = new HBox();
+    HBox titleBar = new HBox();  
     titleBar.setAlignment(Pos.CENTER_RIGHT);
 
     // Set background color for minimize and close buttons
