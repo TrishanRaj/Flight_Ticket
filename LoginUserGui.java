@@ -1,13 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package flightbook;
 
-
-import java.awt.Rectangle;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,7 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
+
 import javafx.stage.Stage;
 
 
@@ -32,7 +25,7 @@ public class LoginUserGui extends Stage {
      
         int fast_book=0;
         
-    public LoginUserGui(Ticket[] book, MyQueue<Ticket> waitList) {
+    public LoginUserGui(Ticket[] book, MyQueue<Ticket> waitList, Flight[] flight) {
         
     setTitle("Login");
  
@@ -64,9 +57,8 @@ public class LoginUserGui extends Stage {
         if (isInputValid()) {
             
         personal_info=usernameField.getText();
-        System.out.println(personal_info);
         
-            openMenuGui(personal_info,book,waitList);
+            openMenuGui(personal_info,book,waitList,flight);
         }
     });
 
@@ -105,8 +97,8 @@ public class LoginUserGui extends Stage {
     alert.showAndWait();
 }
  
-    private void openMenuGui(String userName,Ticket[] book, MyQueue<Ticket> waitList) {
-        MenuGui menuGui = new MenuGui(userName,book,waitList);
+    private void openMenuGui(String userName,Ticket[] book, MyQueue<Ticket> waitList,Flight[] flight) {
+        MenuGui menuGui = new MenuGui(userName,book,waitList,flight);
         menuGui.show();
         close(); // Close the current LoginGui window
     }
