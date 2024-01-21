@@ -1,15 +1,9 @@
 package flightbook;
-
-import java.awt.Rectangle;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 
