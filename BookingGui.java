@@ -1,8 +1,7 @@
 package flightbook;
 
-import java.awt.Image;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.Month;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,7 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
+
 import javafx.scene.layout.BorderStroke;
 import javafx.scene.layout.BorderStrokeStyle;
 import javafx.scene.layout.BorderWidths;
@@ -29,20 +28,23 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.util.Optional;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.DateCell;
+import javafx.util.Callback;
 
 
-public class BookingGui extends Stage {
+public class BookingGui extends Stage {  
 
-    private Label lblTitle, lblName, lblPassNo, lblPhoneNum, lblFlightName, lblFlightTime, lblGender;
-    private TextField txtName, txtPassNo, txtPhoneNum, txtFlightName;
+    private Label lblTitle, lblName, lblPassNo, lblPhoneNum, lblFlightName, lblFlightTime, lblGender,lblDestination;
+    private TextField txtName, txtPassNo, txtPhoneNum, txtFlightName,txtDestination;
     private ToggleGroup genderGroup;
     private RadioButton rbMale, rbFemale;
     private DatePicker datePicker;
 
-    public BookingGui(Ticket[] book, MyQueue<Ticket> waitList, String username) {
+    public BookingGui(String username,Ticket[] book, MyQueue<Ticket> waitList) {
 
-        setTitle("Malaya Flight Booking System");
-        
+        setTitle("Malaya Flight Booking System"); 
         Button btnBack = new Button("Go Back");
 
         // Set spacing between label and button
@@ -66,10 +68,12 @@ public class BookingGui extends Stage {
         // Labels and text fields
         lblName = new Label("Name:");
         txtName = new TextField();
-        infoVBox.getChildren().add(new HBox(100, lblName, txtName));
+        txtName.setPrefWidth(250); 
+        infoVBox.getChildren().add(new HBox(100,lblName, txtName));
 
         lblPassNo = new Label("Passport Number:");
         txtPassNo = new TextField();
+        txtPassNo.setPrefWidth(250); 
         infoVBox.getChildren().add(new HBox(40, lblPassNo, txtPassNo));
 
         lblGender = new Label("Gender:");
@@ -82,15 +86,56 @@ public class BookingGui extends Stage {
 
         lblPhoneNum = new Label("Phone Number:");
         txtPhoneNum = new TextField();
+        txtPhoneNum.setPrefWidth(250); 
         infoVBox.getChildren().add(new HBox(55, lblPhoneNum, txtPhoneNum));
 
-        lblFlightName = new Label("Flight Name: ");
-        txtFlightName = new TextField();
-        infoVBox.getChildren().add(new HBox(68, lblFlightName, txtFlightName));
+        lblDestination=new Label("Destination: ");
+        txtDestination=new TextField("Malaysia --- South Korea");
+        txtDestination.setEditable(false);
+        Font boldFont = Font.font("Arial",FontWeight.BOLD, 12);
+        txtDestination.setFont(boldFont);
+        txtDestination.setPrefWidth(250); 
+        txtDestination.setAlignment(Pos.CENTER);
+        infoVBox.getChildren().add(new HBox(72,lblDestination,txtDestination));
+        
+       
 
         lblFlightTime = new Label("Flight Date: ");
         datePicker = new DatePicker();
-        infoVBox.getChildren().add(new HBox(70, lblFlightTime, datePicker));
+        datePicker.setPrefWidth(250); 
+        infoVBox.getChildren().add(new HBox(75, lblFlightTime, datePicker));
+        
+       //Set the time only to January
+        EventHandler<ActionEvent> eventHandler = event -> {
+            LocalDate selectedDate = datePicker.getValue();
+            if (selectedDate != null) {
+                if (selectedDate.getYear() != 2024 || selectedDate.getMonth() != Month.JANUARY) {
+                    datePicker.setValue(LocalDate.of(2024, Month.JANUARY, 1));
+                }
+            }
+        };
+
+        datePicker.setOnAction(eventHandler);
+
+        // Use a custom DateCell factory to disable dates outside of January 2024
+        Callback<DatePicker, DateCell> dayCellFactory = dp -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item.isBefore(LocalDate.of(2024, Month.JANUARY, 1)) || item.isAfter(LocalDate.of(2024, Month.JANUARY, 31))) {
+                    setDisable(true);
+                    setStyle("-fx-background-color: #ffc0cb;"); // Disable date cell style
+                }
+            }
+        };
+
+        datePicker.setDayCellFactory(dayCellFactory);
+        
+         lblFlightName = new Label("Flight Name: ");
+        txtFlightName = new TextField();
+        txtFlightName.setPrefWidth(250); 
+        infoVBox.getChildren().add(new HBox(68, lblFlightName, txtFlightName));
 
         // GridPane for labels and text fields
         GridPane infoGrid = new GridPane();
@@ -118,10 +163,11 @@ public class BookingGui extends Stage {
         VBox rootVBox = new VBox(20, mainVBox, infoGrid, buttonBox);
         rootVBox.setAlignment(Pos.TOP_CENTER);
             
-        setScene(new Scene(rootVBox, 800, 500));
+        setScene(new Scene(rootVBox, 850, 550));
+         setResizable(false);  
         
         btnBack.setOnAction(e -> {
-            openMenuGui(username);
+            openMenuGui(username,book,waitList);
         });
         
 
@@ -150,19 +196,21 @@ public class BookingGui extends Stage {
                 }
 
                 if (booked) {
-                  //  showSuccessMessage(); // Display success message
+                    
                     myTicket.status = "Confirmed";
-                    openMenuGui(username);
-                    
-                    
-                } else {
-                 //   showSuccessMessage(); // Display success message
+                    showSuccessMessage();
+                    openMenuGui(username,book,waitList);
+                                        
+                } 
+                else {
+                   
                     myTicket.status = "Waiting";
                     waitList.enqueue(myTicket);
-                    openMenuGui(username);
-                 
+                    showSuccessMessage(); // Display success 
+                    openMenuGui(username,book,waitList);
                    
                 }
+              
             }
         });
 
@@ -172,7 +220,7 @@ public class BookingGui extends Stage {
             Optional<ButtonType> result = showConfirmationAlert("Cancel Booking", "Are you sure you want to cancel?");
             if (result.isPresent() && result.get() == ButtonType.OK) {
                 // User confirmed canceling, close the stage
-                openMenuGui(username);
+                openMenuGui(username,book,waitList);
             }
         });
     }
@@ -188,7 +236,7 @@ public class BookingGui extends Stage {
         Alert alert = new Alert(AlertType.INFORMATION);
         alert.setTitle("Booking Success");
         alert.setHeaderText(null);
-        alert.setContentText("Your booking has been successfully confirmed. Thank you and kindly check your ticket status!");
+        alert.setContentText("Booking Done. Thank you and kindly check your ticket status!");
         alert.showAndWait();
     }
 
@@ -216,9 +264,10 @@ public class BookingGui extends Stage {
         alert.setContentText(content);
         return alert.showAndWait();
     }
-
-    private void openMenuGui(String userName) {
-        MenuGui menuGui = new MenuGui(userName);
+    
+ 
+    private void openMenuGui(String userName,Ticket[] book, MyQueue<Ticket> waitList) {
+        MenuGui menuGui = new MenuGui(userName,book,waitList);
         menuGui.show();
         close(); // Close the current LoginGui window
     }
