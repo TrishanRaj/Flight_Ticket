@@ -1,62 +1,218 @@
 
 package flightbook;
 
-import java.util.Scanner;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.Optional;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DateCell;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+import javafx.util.Callback;
 
-public class Edit_Info {
 
-    // 3.Edit Passenger Information [Done]
-    public static void editTicketInfo(Ticket[] book, MyQueue<Ticket> waitList, String user_login) {
+public class EditTicket extends Stage {
+    
+      private Label lblTitle, lblName, lblPassNo, lblPhoneNum, lblFlightName, lblFlightTime, lblGender;
+    private TextField txtName, txtPassNo, txtPhoneNum, txtFlightName;
+    private ToggleGroup genderGroup;
+    private RadioButton rbMale, rbFemale;
+    private DatePicker datePicker;
+    
+    public EditTicket(String username, Ticket[] book, MyQueue<Ticket> waitList,Ticket ticket,Flight[] flight){
+        
+         setTitle("Malaya Flight Booking System"); 
+        Button btnBack = new Button("Go Back");
 
-        Scanner edit = new Scanner(System.in);
-        boolean found_confirm = false;  // Set the info found in booking as false.
+        // Set spacing between label and button
+        VBox vbox = new VBox(10, btnBack);
+        vbox.setAlignment(Pos.TOP_LEFT);
 
-        // Edit for confirmed booking passenger
-        for (Ticket book1 : book) {
-            // Null checks for username and validation
-            if ((book1 != null) && ((book1.username == null && user_login == null) || book1.username.equals(user_login))) {
-                // Information that needed to be edited
-                System.out.print("Passenger Name:");
-                book1.passengerName = edit.nextLine();
-                System.out.print("Passport Num: ");
-                book1.passportNo = edit.nextLine();
-                System.out.print("Phone Num: ");
-                book1.phoneNum = edit.nextLine();
-                System.out.println("\nSuccessfully Edited");
-                found_confirm = true;    // Passenger is found in booking table.
-                return;
-            }
-        }
+        lblTitle = new Label("MALAYA TICKET BOOKING ");
+        lblTitle.setTextFill(Color.BLUE);
+        lblTitle.setFont(Font.font("Serif", FontWeight.BOLD, 30));
 
-        // Edit for waiting list passenger
-        MyQueue<Ticket> tempQueue = new MyQueue<>(waitList.maxSize); // Create a temporary queue to store info of waitList queue
-        boolean found_wait = false; // Set the info found in waitlist as false.
+        // Add both VBoxes and the new components to another VBox
+        VBox mainVBox = new VBox(20, vbox, lblTitle);
+        mainVBox.setAlignment(Pos.TOP_CENTER);
 
-        while (!waitList.isEmpty()) {
-            Ticket temp_waitList = waitList.peek();   // Peek is the info to be enqueued first (head)
-            // Null checks for username and validation
-            if ((temp_waitList != null) && temp_waitList.username.equals(user_login)) {
-                // Information of the user in the waiting list
-                System.out.print("Passenger Name:");
-                temp_waitList.passengerName = edit.nextLine();
-                System.out.print("Passport Num: ");
-                temp_waitList.passportNo = edit.nextLine();
-                System.out.print("Phone Num: ");
-                temp_waitList.phoneNum = edit.nextLine();
-                System.out.println("\nSuccessfully Edited");
-                found_wait = true;
-            }
-            tempQueue.enqueue(waitList.dequeue());  // Add the peak value of waitlist in tempQueue and dequeue the peak value of WaitList
-        }
+        // Create a VBox for labels and text fields with a rectangular border
+        VBox infoVBox = new VBox(10);
+        infoVBox.setPadding(new Insets(50, 250, 50, 150));
+        infoVBox.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, null, new BorderWidths(2))));
+        infoVBox.setStyle("-fx-background-color: #F7E2C8;"); 
 
-        // Once waitlist is fully empty, add back all the value from tempQueue to WaitList.
-        while (!tempQueue.isEmpty()) {
-            waitList.enqueue(tempQueue.dequeue());
-        }
+        // Labels and text fields
+        lblName = new Label("Name:");
+        txtName = new TextField();
+        infoVBox.getChildren().add(new HBox(100,lblName, txtName));
 
-        // No access if no booking.
-        if (!found_wait && !found_confirm) {
-            System.out.println("There is no booking under this username. Thank You.");
+        lblPassNo = new Label("Passport Number:");
+        txtPassNo = new TextField();
+        infoVBox.getChildren().add(new HBox(40, lblPassNo, txtPassNo));
+
+        lblGender = new Label("Gender:");
+        genderGroup = new ToggleGroup();
+        rbMale = new RadioButton("Male");
+        rbMale.setToggleGroup(genderGroup);
+        rbFemale = new RadioButton("Female");
+        rbFemale.setToggleGroup(genderGroup);
+        infoVBox.getChildren().add(new HBox(120, lblGender, new HBox(10, rbMale, rbFemale)));
+
+        lblPhoneNum = new Label("Phone Number:");
+        txtPhoneNum = new TextField();
+        infoVBox.getChildren().add(new HBox(55, lblPhoneNum, txtPhoneNum));
+        
+        lblFlightTime = new Label("Flight Date: ");
+        datePicker = new DatePicker();
+        infoVBox.getChildren().add(new HBox(70, lblFlightTime, datePicker));
+
+              // Set an event handler to reset the date to January 2024 when the user tries to change it
+EventHandler<ActionEvent> eventHandler = event -> {
+    LocalDate selectedDate = datePicker.getValue();
+    if (selectedDate != null) {
+        if (selectedDate.getYear() != 2024 || selectedDate.getMonth() != Month.JANUARY) {
+            datePicker.setValue(LocalDate.of(2024, Month.JANUARY, 1));
         }
     }
+};
+
+datePicker.setOnAction(eventHandler);
+
+// Use a custom DateCell factory to disable dates outside of January 2024
+Callback<DatePicker, DateCell> dayCellFactory = dp -> new DateCell() {
+    @Override
+    public void updateItem(LocalDate item, boolean empty) {
+        super.updateItem(item, empty);
+
+        if (item.isBefore(LocalDate.of(2024, Month.JANUARY, 1)) || item.isAfter(LocalDate.of(2024, Month.JANUARY, 31))) {
+            setDisable(true);
+            setStyle("-fx-background-color: #ffc0cb;"); // Disable date cell style
+        }
+    }
+};
+
+datePicker.setDayCellFactory(dayCellFactory);
+
+        lblFlightName = new Label("Flight Name: ");
+        txtFlightName = new TextField();
+        infoVBox.getChildren().add(new HBox(68, lblFlightName, txtFlightName));
+
+        
+
+        // GridPane for labels and text fields
+        GridPane infoGrid = new GridPane();
+        infoGrid.setHgap(10);
+        infoGrid.setVgap(10);
+        infoGrid.setAlignment(Pos.CENTER);
+
+        // Add the VBox with labels and text fields to the GridPane
+        infoGrid.add(infoVBox, 0, 0);
+
+        // HBox for buttons
+        HBox buttonBox = new HBox(10);
+        Button btnUpdate = new Button("Update");
+        Button btnCancel = new Button("Cancel");
+        
+        btnUpdate.setPrefSize(100, 40);  // Set width and height
+        btnCancel.setPrefSize(100, 40);  // Set width and height        
+        btnUpdate.setStyle("-fx-font-size: 14; -fx-background-color: #4CAF50; -fx-text-fill: white;"); // Green background, white text
+        btnCancel.setStyle("-fx-font-size: 14;-fx-background-color: #F46161; -fx-text-fill: white;"); // Red background, white text
+
+        buttonBox.getChildren().addAll(btnUpdate, btnCancel);
+        buttonBox.setAlignment(Pos.CENTER);
+
+        // Another VBox to contain everything
+        VBox rootVBox = new VBox(20, mainVBox, infoGrid, buttonBox);
+        rootVBox.setAlignment(Pos.TOP_CENTER);
+            
+        setScene(new Scene(rootVBox, 800, 500));
+         setResizable(false);
+        
+         // Set initial values in text fields and date picker
+        setInitialValues(ticket);
+        
+           btnBack.setOnAction(e -> {
+               openTicketGui(username, book, waitList,flight);
+        });
+           
+            btnUpdate.setOnAction(e -> {
+                updateValue(ticket,username,book,waitList,flight);
+        });
+ 
+            // Event handler for the Cancel button
+        btnCancel.setOnAction(e -> {
+            // Ask for confirmation before canceling
+            Optional<ButtonType> result = showConfirmationAlert("Cancel Booking", "Are you sure you want to cancel?");
+            if (result.isPresent() && result.get() == ButtonType.OK) {
+                // User confirmed canceling, close the stage
+                openTicketGui(username,book,waitList,flight);
+            }
+        });
+    }
+    
+    private void setInitialValues(Ticket ticket) {
+        txtName.setText(ticket.passengerName);
+        txtPassNo.setText(ticket.passportNo);
+        txtPhoneNum.setText(ticket.phoneNum);
+        txtFlightName.setText(ticket.flightName);
+        datePicker.setValue(LocalDate.parse(ticket.flightTime));
+    /*    if (ticketToEdit.gender.equals("Male")) {
+            rbMale.setSelected(true);
+        } else {
+            rbFemale.setSelected(true);
+        } */
+    }
+    
+    private void updateValue(Ticket ticket,String userName,Ticket[] book, MyQueue<Ticket> waitList,Flight[] flight) {
+       ticket.passengerName=txtName.getText();
+       ticket.passportNo=txtPassNo.getText();
+       ticket.phoneNum=txtPhoneNum.getText();
+       ticket.flightName=txtFlightName.getText();
+        ticket.flightTime=datePicker.getValue().toString();
+    /*    if (ticketToEdit.gender.equals("Male")) {
+            rbMale.setSelected(true);
+        } else {
+            rbFemale.setSelected(true);
+        } */
+        openTicketGui(userName, book, waitList,flight);
+    
+    }
+    
+    
+     private  void openTicketGui(String userName,Ticket[] book, MyQueue<Ticket> waitList, Flight[] flight){
+         TicketGui ticketGui= new TicketGui(userName,book,waitList,flight);
+         ticketGui.show();
+         close();
+     }
+     
+        private Optional<ButtonType> showConfirmationAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        return alert.showAndWait();
+    }
+    
 }
