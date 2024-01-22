@@ -1,10 +1,6 @@
 
 package flightbook;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -12,27 +8,28 @@ class Flight {
     String flightName, flightTime, flightDate, flightWeek;
     int flightCapacity;
 
-    public Flight(String flightName, String flightTime, String flightDate, int flightCapacity, int flightWeek) {
+    public Flight(String flightName, String flightTime, String flightDate, int flightCapacity, String flightWeek) {
         this.flightName = flightName;
         this.flightTime = flightTime;
         this.flightDate = flightDate;
         this.flightCapacity = flightCapacity;
-        this.flightWeek = Integer.toString(flightWeek);
+        this.flightWeek = flightWeek;
     }
 }
 
+
 //Ticket Information
 class Ticket {
-    String passengerName, passportNo, phoneNum, username, status, flightName,flightTime,gender,departure,arrival,flightDate;
+    String passengerName, passportNo, phoneNum, username, status, flightsName,flightTime,gender,departure,arrival,flightDate;
    
 
     public Ticket(String passengerName, String passportNo, String phoneNum, String username,
-                  String flightName, String flightDate,String flightTime, String status, String gender,String departure,String arrival) {
+                  String flightsName, String flightDate,String flightTime, String status, String gender,String departure,String arrival) {
         this.passengerName = passengerName;
         this.passportNo = passportNo;
         this.phoneNum = phoneNum;
         this.username = username;
-        this.flightName = flightName;
+        this.flightsName = flightsName;
         this.departure=departure;
         this.arrival=arrival;
         this.gender=gender;
@@ -43,7 +40,7 @@ class Ticket {
 
     @Override
     public String toString() {
-        return "| " + passportNo + " |\t" + passengerName + "\t| " + flightName + "\t| Waiting\t|";
+        return "| " + passportNo + " |\t" + passengerName + "\t| " + flightsName + "\t| Waiting\t|";
     }
      public boolean belongsToUser(String username) {
         return this.username.equals(username);
@@ -119,39 +116,29 @@ public class Main extends Application {
         Ticket[] book = new Ticket[3];
         MyQueue<Ticket> myq = new MyQueue<>(10);
          Flight[] malaya = new Flight[20];
-         int a=0;
+        
          
         //Flight Mock Value
-        malaya[0] = new Flight("Malaya 307", "11.30 AM", "02-01-2024", 0, 1);
-        malaya[1] = new Flight("Malaya 308", "12.45 PM", "03-01-2024", 120, 1);
-        malaya[2] = new Flight("Malaya 309", "02.00 PM", "04-01-2024", 80, 1);
-        malaya[3] = new Flight("Malaya 310", "03.15 PM", "06-01-2024", 150, 1);
-        malaya[4] = new Flight("Malaya 311", "04.30 PM", "08-01-2024", 90, 2);
-        malaya[5] = new Flight("Malaya 312", "05.45 PM", "09-01-2024", 110, 2);
-        malaya[6] = new Flight("Malaya 313", "07.00 PM", "12-01-2024", 130, 2);
-        malaya[7] = new Flight("Malaya 314", "08.15 PM", "13-01-2024", 100, 2);
-        malaya[8] = new Flight("Malaya 315", "09.30 PM", "15-01-2024", 120, 3);
-        malaya[9] = new Flight("Malaya 316", "10.45 PM", "17-01-2024", 80, 3);
-        malaya[10] = new Flight("Malaya 317", "11.00 AM", "18-01-2024", 90, 3);
-        malaya[11] = new Flight("Malaya 318", "12.15 PM", "20-01-2024", 110, 3);
-        malaya[12] = new Flight("Malaya 319", "01.30 PM", "22-01-2024", 130, 4);
-        malaya[13] = new Flight("Malaya 320", "02.45 PM", "23-01-2024", 100, 4);
-        malaya[14] = new Flight("Malaya 321", "04.00 PM", "25-01-2024", 120, 4);
-        malaya[15] = new Flight("Malaya 322", "05.15 PM", "26-01-2024", 80, 4);
-        malaya[16] = new Flight("Malaya 323", "06.30 PM", "28-01-2024", 110, 4);
-        malaya[17] = new Flight("Malaya 324", "07.45 PM", "29-01-2024", 130, 5);
-        malaya[18] = new Flight("Malaya 325", "09.00 PM", "30-01-2024", 100, 5);
-        malaya[19] = new Flight("Malaya 326", "09.00 PM", "31-01-2024", 90, 5);
-    
-            Map<String, Ticket[]> ticketMap = new HashMap<>();
-
-       for (Flight k : malaya) {
-           String flightName = k.flightName;
-           Ticket[] tickets = new Ticket[k.flightCapacity];
-           ticketMap.put(flightName, tickets);
-       }
-       
-  
+        malaya[0] = new Flight("Malaya 307", "11.30 AM", "02-01-2024", 90, "1");
+        malaya[1] = new Flight("Malaya 308", "12.45 PM", "03-01-2024", 120, "1");
+        malaya[2] = new Flight("Malaya 309", "02.00 PM", "04-01-2024", 80, "1");
+        malaya[3] = new Flight("Malaya 310", "03.15 PM", "06-01-2024", 150, "1");
+        malaya[4] = new Flight("Malaya 311", "04.30 PM", "08-01-2024", 90, "2");
+        malaya[5] = new Flight("Malaya 312", "05.45 PM", "09-01-2024", 110, "2");
+        malaya[6] = new Flight("Malaya 313", "07.00 PM", "12-01-2024", 130, "2");
+        malaya[7] = new Flight("Malaya 314", "08.15 PM", "13-01-2024", 100, "2");
+        malaya[8] = new Flight("Malaya 315", "09.30 PM", "15-01-2024", 120, "3");
+        malaya[9] = new Flight("Malaya 316", "10.45 PM", "17-01-2024", 80, "3");
+        malaya[10] = new Flight("Malaya 317", "11.00 AM", "18-01-2024", 90, "3");
+        malaya[11] = new Flight("Malaya 318", "12.15 PM", "20-01-2024", 110, "3");
+        malaya[12] = new Flight("Malaya 319", "01.30 PM", "22-01-2024", 130, "4");
+        malaya[13] = new Flight("Malaya 320", "02.45 PM", "23-01-2024", 100, "4");
+        malaya[14] = new Flight("Malaya 321", "04.00 PM", "25-01-2024", 120, "4");
+        malaya[15] = new Flight("Malaya 322", "05.15 PM", "26-01-2024", 80, "4");
+        malaya[16] = new Flight("Malaya 323", "06.30 PM", "28-01-2024", 110, "4");
+        malaya[17] = new Flight("Malaya 324", "07.45 PM", "29-01-2024", 130, "5");
+        malaya[18] = new Flight("Malaya 325", "09.00 PM", "30-01-2024", 100, "5");
+        malaya[19] = new Flight("Malaya 326", "09.00 PM", "31-01-2024", 90, "5");
 
         Ticket num1 = new Ticket("John", "010711050221", "0126240537", "john123", "Malaya 307", "2024-01-02","12.45 PM", "Confirmed","Male","Malaysia","South Korea");
         Ticket num2 = new Ticket("Sarah", "010711050222", "0126240537", "john123", "Malaya 307", "2024-01-02","12.45 PM", "Confirmed","Female","Malaysia","South Korea");
@@ -171,6 +158,6 @@ public class Main extends Application {
     private void openLoginGui(Stage primaryStage, Ticket[] book, MyQueue<Ticket> waitList,Flight[] flight) {
         LoginUserGui loginGui = new LoginUserGui(book, waitList,flight);
         loginGui.show();
-        // Close the current MenuGui window
+
     }
 }
