@@ -30,15 +30,10 @@ public class LoginUserGui extends Stage {
     setTitle("Login");
  
     BorderPane root = new BorderPane();
-
-    // Create title bar
     HBox titleBar = new HBox();  
     titleBar.setAlignment(Pos.CENTER_RIGHT);
-
-    // Set background color for minimize and close buttons
     String buttonColor = "-fx-background-color: gold;";
 
-    // Create login form
     GridPane loginGrid = new GridPane();
     loginGrid.setAlignment(Pos.CENTER);
     loginGrid.setHgap(10);
@@ -54,15 +49,17 @@ public class LoginUserGui extends Stage {
     
     Button loginButton = new Button("Login");
     loginButton.setOnAction(e -> {
-        if (isInputValid()) {
-            
-        personal_info=usernameField.getText();
-        
+         if(isAdmin()){
+            personal_info=usernameField.getText();
+             openAdminTicketGui(personal_info, book, waitList, flight);
+        }
+        else if (isInputValid()) {    
+        personal_info=usernameField.getText();       
             openMenuGui(personal_info,book,waitList,flight);
         }
+       
     });
 
-    // Set background color for the login button
     loginButton.setStyle(buttonColor);
 
     loginGrid.add(new Label("Username:"), 0, 0);
@@ -79,7 +76,6 @@ public class LoginUserGui extends Stage {
     Scene scene = new Scene(root, 400, 300);
     this.setScene(scene);
      
-     
     }
 
      private boolean isInputValid() {
@@ -87,7 +83,17 @@ public class LoginUserGui extends Stage {
         showAlert(Alert.AlertType.ERROR, "Invalid Information", "Please enter the username and password.");
         return false;
     }
+     else if(usernameField.getText().equals("ADMIN") && passwordField.getText().equals("abc123")){
+         
+     }
     return true;
+}
+     
+      private boolean isAdmin() {
+    if(usernameField.getText().equals("ADMIN") && passwordField.getText().equals("abc123")){
+        return true;
+    }
+    return false;
 }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
@@ -100,6 +106,11 @@ public class LoginUserGui extends Stage {
     private void openMenuGui(String userName,Ticket[] book, MyQueue<Ticket> waitList,Flight[] flight) {
         MenuGui menuGui = new MenuGui(userName,book,waitList,flight);
         menuGui.show();
+        close(); // Close the current LoginGui window
+    }
+     private void openAdminTicketGui(String userName,Ticket[] book, MyQueue<Ticket> waitList,Flight[] flight) {
+        AdminTicketGui adminTicketGui = new AdminTicketGui(userName,book,waitList,flight);
+        adminTicketGui.show();
         close(); // Close the current LoginGui window
     }
 }
