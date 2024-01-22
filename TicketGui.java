@@ -3,10 +3,8 @@ package flightbook;
 import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -20,7 +18,8 @@ public class TicketGui extends Stage {
     public TicketGui(String username, Ticket[] book, MyQueue<Ticket> waitList,Flight[] flight) {
         setTitle("Melaya Flight Booking Ticket");
 
-        Button btnBack = new Button("Go Back");
+        Button btnBack = new Button("🔙");
+        btnBack.setStyle("-fx-font-size: 20;");
 
         btnBack.setOnAction(e -> openMenuGui(username, book, waitList,flight));
 
@@ -100,10 +99,8 @@ public class TicketGui extends Stage {
         departureDateColumn.setCellFactory(col -> createCenterAlignedCell());
         statusColumn.setCellFactory(col -> createCenterAlignedCell());
 
-        // Add columns to the TableView
         tableView.getColumns().addAll(idColumn, nameColumn,genderColumn,phoneColumn,departureColumn,arrivalColumn, flightNameColumn,departureDateColumn ,departureTimeColumn, statusColumn);
 
-        // Create a new column for "Edit" buttons
         TableColumn<Ticket, Void> editColumn = new TableColumn<>("");
         editColumn.setCellFactory(param -> new TableCell<>() {
            
@@ -179,20 +176,19 @@ public class TicketGui extends Stage {
         genderColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().gender));
         departureColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().departure));
         arrivalColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().arrival));
-        flightNameColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().flightName));
+        flightNameColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().flightsName));
         departureDateColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().flightDate));
         departureTimeColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().flightTime));
         statusColumn.setCellValueFactory(cellData -> new javafx.beans.property.SimpleStringProperty(cellData.getValue().status));
 
-        // Set data to the TableView
         tableView.setItems(data);
 
-        // Create a BorderPane to include Label, TableView, and HBox
         BorderPane borderPane = new BorderPane();
         borderPane.setTop(hboxButtons);
         borderPane.setCenter(flightStatusLabel);
         BorderPane.setAlignment(flightStatusLabel, javafx.geometry.Pos.CENTER);
         borderPane.setBottom(tableView);
+        borderPane.setStyle("-fx-background-color: #EEF7F0;"); 
 
         setScene(new Scene(borderPane, 1380, 500));
         setResizable(false);
@@ -205,14 +201,13 @@ public class TicketGui extends Stage {
             if (ticket != null && ticket.belongsToUser(username)) {
                 data.add(ticket);
                 view_confirm = true;
-            }
+            } 
         }
 
         // View for WaitingList
         MyQueue<Ticket> temp_queue = new MyQueue<>(waitList.maxSize);
         while (!waitList.isEmpty()) {
             Ticket temp_View = waitList.peek();
-            // Check if the ticket belongs to the specified user
             if (temp_View != null && temp_View.belongsToUser(username)) {
                 data.add(temp_View);
                 view_wait = true;
@@ -225,11 +220,11 @@ public class TicketGui extends Stage {
         }
 
         if (!view_confirm && !view_wait) {
-            System.out.println("There is no booking under this username. Thank You.");
+             showInfoAlert("No Booking Found", "Please do a booking to check ticket status. Thank You.");
+           
         }
     }
 
-    // Helper method to create a center-aligned cell
     private TableCell<Ticket, String> createCenterAlignedCell() {
         return new TableCell<>() {
             @Override
@@ -300,7 +295,7 @@ public class TicketGui extends Stage {
                 if (!myq.isEmpty() && cancelBook) {
                     Ticket change = myq.peek();
                     book[book.length - 1] = new Ticket(change.passengerName, change.passportNo,
-                            change.phoneNum, change.username, change.flightName, change.flightDate,change.flightTime, "Confirmed", change.gender,change.departure
+                            change.phoneNum, change.username, change.flightsName, change.flightDate,change.flightTime, "Confirmed", change.gender,change.departure
                                     ,change.arrival);
                     myq.dequeue();
                    
@@ -328,9 +323,16 @@ public class TicketGui extends Stage {
 
         // Username that doesn't book any ticket couldn't access it.
         if (!cancelBook && !cancelWait) {
-            System.out.println("There is no booking under this username. Thank You.");
+            showInfoAlert("No Booking Found", "There is no booking under this username. Thank You.");
         }
     }
-    
+    private void showInfoAlert(String title, String content) {
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle(title);
+    alert.setHeaderText(null);
+    alert.setContentText(content);
+    alert.showAndWait();
+}
+
     
 }
